@@ -1,5 +1,6 @@
 package moto;
 import java.util.Scanner;
+import java.util.Random;
 class Banco {
     public int numConta;
     protected String tipo;
@@ -8,17 +9,29 @@ class Banco {
     private boolean status;
 
     Scanner teclado = new Scanner(System.in);
+    Random gerador = new Random();
+
+    public void estadoConta(){
+        System.out.println("---------------------------------------------------");
+        System.out.println("Conta " + this.getTipo().toUpperCase() + "  " + this.getNumConta());
+        System.out.println( "Usuário: " + this.getDono());
+        System.out.println("Saldo: R$" + this.getSaldo());
+        if (this.getStatus()){
+            System.out.println("ATIVA");
+        } else {
+            System.out.println("INATIVA");
+        }
+    System.out.println("---------------------------------------------------");
+    }
 
 
-    public void abrirConta(String t){
-        System.out.println("Digite o nome do usuário: ");
-        String nomeCliente = teclado.nextLine();
-        this.setDono(nomeCliente); 
+    public void abrirConta(String t){ 
         setStatus(true);
         System.out.println("Olá " + getDono() + "!");
-        System.out.println("Deseja abrir uma conta corrente(CC) ou conta poupança(CP)?");
-        t = teclado.nextLine();
+    
         this.setTipo(t);
+        int NumConta = gerador.nextInt(999999) + 1000;
+        this.setNumConta(NumConta );
         if (this.getTipo().equalsIgnoreCase("CC")){
             this.setSaldo( 50);
             System.out.println("Você escolheu conta corrente! Seu saldo é de " + this.getSaldo());      
@@ -69,25 +82,46 @@ class Banco {
     }
     }
 
-    public void pagarMensal(){
-        int v;
+    public void pagarMensal() {
+    // verifica
+    //  se o usuário tem uma conta ativa
+    if (this.getStatus()) {
+        
+        // perguntam se ele quer pagar
         System.out.println("Tem certeza que deseja pagar a mensalidade? [S/ N]");
         String opcaoMensal = teclado.nextLine();
-        if (opcaoMensal.equalsIgnoreCase("S" && this.getSaldo() > v)){
-             if (this.getTipo().equalsIgnoreCase("cc")){
-                 v = 12;
-                 System.out.println("Pagamento mensal de R$"+ v + "realizado com sucesso, seu saldo agora é de R$" + this.getSaldo());
-             } else if (this.getTipo().equalsIgnoreCase("cp")){
-                v = 20;
-                System.out.println("Pagamento mensal de R$"+ v + "realizado com sucesso, seu saldo agora é de R$" + this.getSaldo());
-             } else {
-                System.out.println("Erro no pagamento. Seu saldo de R$" + this.getSaldo() + "não é suficiente para pagar R$"+v);
-             }
-        } else {
-            System.out.println("Reinicie o programa para voltar ao MENU.");
-        }
-}  //System.out.println("Pagamento mensal de R$"+ v + "realizado com sucesso, seu saldo agora é de R$" + this.getSaldo());
+        
+        if (opcaoMensal.equalsIgnoreCase("S")) {
+            int v = 0;
+            switch (this.getTipo().toLowerCase()) {
+                case "cc":
+                    v = 12;
+                    break;
+                case "cp":
+                    v = 20;
+                    break;
+                default:
+                    System.out.println("Erro: Tipo de conta inválido.");
+                    return; 
+            }
 
+            if (this.getSaldo() >= v) {
+                this.setSaldo(this.getSaldo() - v); 
+                System.out.println("Pagamento mensal de R$" + v + " realizado por " + this.getDono() + ", seu saldo agora é de R$" + this.getSaldo());
+            } else {
+                System.out.println("Erro no pagamento. Seu saldo de R$" + this.getSaldo() + " não é suficiente para pagar R$" + v);
+            }
+            
+        } else {
+            // Se ele tiver conta, mas digitar "N" (ou qualquer outra coisa)
+            System.out.println("Pagamento cancelado. Reinicie o programa para voltar ao MENU.");
+        }
+        
+    } else {
+        // Se this.getStatus() for falso (não tem conta aberta)
+        System.out.println("Você precisa abrir uma conta primeiro!");
+    }
+}
     public ContaBanco(){
         this.setSaldo(0);
         this.setStatus(false);
